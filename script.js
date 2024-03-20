@@ -2,6 +2,7 @@ let teams = ['RCB', 'KKR'];
 let runs = [0,1,2,3,4,6,'W'];
 
 const chosenTeam = teams[Math.floor(Math.random() * 2 )];
+let nextTeam;
 
 let team1Prog = [];
 let team2Prog = [];
@@ -27,6 +28,7 @@ function updateScore() {
 }
 
 
+
 function playSuperOver() {
     var buttonValue = document.getElementById("play");
     var resultText = document.getElementById("res");
@@ -36,10 +38,15 @@ function playSuperOver() {
 
     if(buttonValue.getAttribute("value") == "strike") {
         buttonValue.setAttribute("value", "play");
-        buttonValue.textContent = chosenTeam + " Batting";
+        if(startSecond == true) {
+            buttonValue.textContent = teams.filter((team) => team != chosenTeam)[0] + " Batting";
+        } else {
+            buttonValue.textContent = chosenTeam + " Batting";
+        }
+
+
     } else {
         let chosenRun = runs[Math.floor(Math.random()*7)];
-        console.log(startSecond);
         let run = chosenRun == "W" ? 0 : chosenRun;
         if(startSecond == false) {
             if(chosenTeam == "RCB") {
@@ -47,29 +54,24 @@ function playSuperOver() {
                 if(chosenRun == "W") {
                     wickCount1 += 1;
                 }
-                console.log(team1Prog, team2Prog);
                 team1Run += run;
                 team1Score.textContent = team1Run;
     
                 if(team1Prog.length == 6 || wickCount1 == 2 ) {
-                    console.log("Stop");
                     startSecond = true;
-                    buttonValue.setAttribute("value", "strike");
-                    console.log(buttonValue.getAttribute("value"));
+                    buttonValue.setAttribute("value", "strike");                    
                 }
+                
             } else if(chosenTeam == "KKR") {
                 team2Prog.push(chosenRun);
                 if(chosenRun == "W") {
                     wickCount2 += 1;
                 }
-                console.log(team1Prog, team2Prog);
                 team2Run += run;
                 team2Score.textContent = team2Run;
     
                 if(team2Prog.length == 6 || wickCount2 == 2) {
-                    console.log("Stop");
                     buttonValue.setAttribute("value", "strike");
-                    console.log(buttonValue.getAttribute("value"));
                     startSecond = true;
                 }
     
@@ -77,16 +79,14 @@ function playSuperOver() {
             updateScore();
         }
 
-        if(startSecond == true) {
-            let nextTeam = teams.filter((team) => team != chosenTeam)[0];
-            console.log(nextTeam);
-            if(buttonValue.getAttribute("value") != "strike") {
-                let chosenRun = runs[Math.floor(Math.random()*7)];
-                let run = chosenRun == "W" ? 0 : chosenRun;
-            
-            }
 
+        if(startSecond == true && buttonValue.getAttribute("value") == "play") {
+            let nextTeam = teams.filter((team) => team != chosenTeam)[0];
+
+            let chosenRun = runs[Math.floor(Math.random()*7)];
+            let run = chosenRun == "W" ? 0 : chosenRun;
             resultText.textContent = "End of 1st Half";
+            buttonValue.textContent = nextTeam + " Batting";
 
             if(buttonValue.getAttribute("value") == "strike") {
                 buttonValue.setAttribute("value", "play");
@@ -98,14 +98,22 @@ function playSuperOver() {
             if(chosenRun == "W") {
                 wickCount1 += 1;
             }
-            console.log(team1Prog, team2Prog);
             team1Run += run;
             team1Score.textContent = team1Run;
             team1Prog.push(chosenRun);
 
-            if(team1Prog.length == 6 || wickCount1 == 2 || team1Run >= team2Run ) {
-                console.log("Stop");
+            if(team1Prog.length == 6 || wickCount1 == 2 || team1Run > team2Run ) {
                 resultText.textContent = "RCB Wins the Match";
+                buttonValue.setAttribute("disabled", true);
+            }
+
+            if((team1Run < team2Run) && (team1Prog.length == 6 || wickCount1 == 2) ) {
+                resultText.textContent = "KKR Wins the Match";
+                buttonValue.setAttribute("disabled", true);
+            }
+
+            else if((team1Run == team2Run ) && (team1Prog.length == 6 || wickCount1 == 2)) {
+                resultText.textContent = "Match Tied";
                 buttonValue.setAttribute("disabled", true);
             }
         } else if(nextTeam == "KKR") {
@@ -114,16 +122,24 @@ function playSuperOver() {
                 wickCount2 += 1;
             }
             
-            console.log(team1Prog, team2Prog);
             team2Run += run;
             team2Score.textContent = team2Run;
             team2Prog.push(chosenRun);
 
-            if(team2Prog.length == 6 || wickCount2 == 2 || team2Run >= team1Run) {
-                console.log("Stop 2nd Innings");
+            if(team2Prog.length == 6 || wickCount2 == 2 || team2Run > team1Run) {
                 resultText.textContent = "KKR Wins the Match";
                 buttonValue.setAttribute("disabled", true);
                 
+            }
+
+            if((team2Run < team1Run) && (team2Prog.length == 6 || wickCount2 == 2) ) {
+                resultText.textContent = "RCB Wins the Match";
+                buttonValue.setAttribute("disabled", true);
+            }
+
+            else if((team1Run == team2Run) && (team2Prog.length == 6 || wickCount2 == 2)) {
+                resultText.textContent = "Match Tied";
+                buttonValue.setAttribute("disabled", true);
             }
 
         }
